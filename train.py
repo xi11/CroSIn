@@ -142,13 +142,14 @@ history = LossHistory()
 adam = Adam(lr=0.001)
 superPSmodel.compile(loss=categorical_crossentropy, optimizer=adam, metrics=['accuracy'])
 
-modelpath = "./model_checkpoint/psNet_adam_val_C_Sup52_res50_conv128_e40" + ".h5"
-model_checkpoint = ModelCheckpoint('./model_checkpoint/psNet_adam_val_C_Sup52_res50_conv128_e40' + '_{epoch:02d}' + '.h5', monitor='val_acc', save_best_only=True)
+modelpath = r'./model_checkpoint'
+if not os.path.exists(modelpath):
+    os.makedirs(modelpath)
+
+model_checkpoint = ModelCheckpoint(os.path.join(modelpath, 'psNet_adam_val_C_Sup52_res50_conv128_e' + '{epoch:02d}' + '.h5'), monitor='val_acc', save_best_only=True)
 callbacks = [history, LearningRateScheduler(scheduler), model_checkpoint]
-
-
 hist = superPSmodel.fit([img_a, img_b, img_c], masks, epochs=40, batch_size=8, validation_split=0.1, verbose=1, shuffle=True, callbacks=callbacks)
-superPSmodel.save(modelpath)
+superPSmodel.save(os.path.join(modelpath, 'psNet_adam_val_C_Sup52_res50_conv128_e40.h5'))
 
 history.loss_plot('epoch')
 
